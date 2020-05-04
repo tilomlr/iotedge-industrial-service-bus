@@ -73,7 +73,7 @@ catch() {
 }
 
 # Login and optinaly set subscription
-az login --tenant $1
+az login
 if [ -z "$1" ]; then
   echo "No subscription provided. Using default subscription"
 else
