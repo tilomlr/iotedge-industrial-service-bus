@@ -79,7 +79,7 @@
               "image": "${MODULES.ISBReader}",
               "createOptions": {
                 "Env": [
-                  "TOPIC=opc-data"
+                  "TOPIC=modbus-data"
                 ]
               }
             }

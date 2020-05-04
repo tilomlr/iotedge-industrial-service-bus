@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 getRandomString() {
   sed "s/[^a-zA-Z0-9]//g" <<< $(openssl rand -base64 4) | tr '[:upper:]' '[:lower:]'
 }
@@ -29,21 +30,30 @@ deployPlc() {
     --generate-ssh-keys --size ${VM_SIZE} --custom-data ${CLOUD_INIT_PLC} --admin-username ${ADMIN_USERNAME} --no-wait
 }
 
-RG_NAME=isb-federation-demo
+deployISB() {
+  az vm create --resource-group ${RG_NAME} --name $1 --image UbuntuLTS \
+    --vnet-name ${VNET_NAME} --subnet ${SUBNET_NAME} --nsg ${NSG_NAME} --public-ip-address "" \
+    --generate-ssh-keys --size ${VM_SIZE} --custom-data ${CLOUD_INIT_ISB} --admin-username ${ADMIN_USERNAME} --no-wait
+}
+
+
+RG_NAME=rg-iotedge-industrial-service-bus
 VNET_NAME=isb-demo-vnet
 SUBNET_NAME=isb-demo-subnet
 NSG_NAME=isb-demo-nsg
 BASTION_PUBLIC_IP=isb-bastion-piblic-ip-$(getRandomString)
 VM_SIZE=Standard_B1ms
 IOT_EDGE_VM_NAME_PREFIX=isb-demo-iotedge
+ISB_VM_NAME_PREFIX=isb-demo-nats
 PLC_VM_NAME_PREFIX=isb-demo-plc
 ISB_IOT_HUB=isb-demo-iot-hub-$(getRandomString)
 BASTION_NAME=isb-azure-bastion-$(getRandomString)
 CLOUD_INIT_PLC=cloud-init-plc.yml
 CLOUD_INIT_IOT_EDGE=cloud-init-iotedge.yml
 ADMIN_USERNAME=azureuser
-IOT_EDGE_READER_DEPLOYMENT="../iotedge/config/deployment.isbreader.amd64.json"
-IOT_EDGE_WRITER_DEPLOYMENT="../iotedge/config/deployment.isbwriter.amd64.json"
+IOT_EDGE_READER_DEPLOYMENT="../iotedgeNats/config/deployment.isbreader.amd64.json"
+IOT_EDGE_WRITER_DEPLOYMENT="../iotedgeNats/config/deployment.isbwriter.amd64.json"
+
 
 # Install extensions
 az extension add --name azure-iot
@@ -101,19 +111,21 @@ az network bastion create --name ${BASTION_NAME} --public-ip-address ${BASTION_P
   --resource-group ${RG_NAME} --vnet-name ${VNET_NAME}
 
 # Prepare PLCs
-deployPlc ${PLC_VM_NAME_PREFIX}-1
-deployPlc ${PLC_VM_NAME_PREFIX}-2
+# deployPlc ${PLC_VM_NAME_PREFIX}-1
+# deployPlc ${PLC_VM_NAME_PREFIX}-2
+
+deployISB ${ISB_VM_NAME_PREFIX}-1
 
 # Prepare IoT Edge Devices
+
 deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-1 ${IOT_EDGE_WRITER_DEPLOYMENT}
-deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-2 ${IOT_EDGE_WRITER_DEPLOYMENT}
-deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-3 ${IOT_EDGE_READER_DEPLOYMENT}
+deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-2 ${IOT_EDGE_READER_DEPLOYMENT}
 
 # Write .env file
 echo "ISB_IOT_HUB=${ISB_IOT_HUB}" >> .env
 echo "IOT_EDGE_1=${IOT_EDGE_VM_NAME_PREFIX}-1" >> .env
 echo "IOT_EDGE_2=${IOT_EDGE_VM_NAME_PREFIX}-2" >> .env
-echo "IOT_EDGE_3=${IOT_EDGE_VM_NAME_PREFIX}-3" >> .env
+
 
 # Restart Dapr modules as a workaround for Dapr not yet implementing decent retry mechanism for reconenctions to a pub/sub broker
 ./restart-dapr.sh

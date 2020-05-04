@@ -8,7 +8,7 @@
           "type": "docker",
           "settings": {
             "minDockerVersion": "v1.25",
-            "loggingOptions": ""            
+            "loggingOptions": ""           
           }
         },
         "systemModules": {
@@ -28,7 +28,7 @@
             }
           }
         },
-        "modules": {          
+        "modules": {
           "redis": {
             "version": "1.0",
             "type": "docker",
@@ -38,7 +38,7 @@
               "image": "redis",
               "createOptions": {}
             }
-          },        
+          },
           "isbwriter": {
             "version": "1.0",
             "type": "docker",
@@ -48,7 +48,7 @@
               "image": "${MODULES.ISBWriter}",
               "createOptions": {
                 "Env": [
-                  "TOPIC=opc-data"
+                  "TOPIC=modbus-data"
                 ]
               }
             }
@@ -62,6 +62,26 @@
               "image": "mcr.microsoft.com/azureiotedge/modbus:1.0",
               "createOptions": {}
             }
+          },
+          "Modbussimulator": {
+            "version": "2.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "rdscompany/modbussimulator:2.0",
+              "createOptions": {                
+                "HostConfig": {                 
+                  "PortBindings": {
+                    "502/tcp": [
+                      {
+                        "HostPort": "502"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -70,7 +90,8 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "modbusToISBWriter": "FROM /messages/modules/Modbus/outputs/modbusOutput/* INTO BrokeredEndpoint(\"/modules/isbwriter/inputs/input1\")"
+          "modbusToISBWriter": "FROM /messages/modules/Modbus/outputs/modbusOutput/* INTO BrokeredEndpoint(\"/modules/isbwriter/inputs/input1\")",
+          "ModbussimulatorToIoTHub": "FROM /messages/modules/Modbussimulator/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
@@ -92,7 +113,7 @@
                 "UnitId": "1"
               }
             },
-            "SlaveConnection": "13.94.200.122"
+            "SlaveConnection": "104.214.227.142"
           }
         }
       }

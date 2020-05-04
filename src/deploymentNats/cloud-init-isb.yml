@@ -31,6 +31,7 @@ packages:
 
 runcmd:
   - hostn=$(cat /etc/hostname)
+  - curl -L https://github.com/docker/compose/releases/download//docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
   - |
     set -x
     (
@@ -38,8 +39,30 @@ runcmd:
       while [ $(ps -ef | grep -v grep | grep docker | wc -l) -le 0 ]; do 
         sleep 3
       done
-
-      docker run -v /home/azureuser:/appdata -p 50000:50000 mcr.microsoft.com/iotedge/opc-plc:1.0.1-linux-amd64 --aa --ph ${hostn}
+      
+      docker network create nats
+      touch /usr/share/nats-cluster.yml
+      cat  <<EOF > /usr/share/nats-cluster.yml
+      version: "3"
+      services:
+        nats:
+          image: nats-streaming
+          ports:
+            - "8222:8222"
+            - "4222:4222"
+        nats-1:
+          image: nats
+          command: "--cluster nats://0.0.0.0:6222 --routes=nats://nats:6222"
+        nats-2:
+          image: nats
+          command: "--cluster nats://0.0.0.0:6222 --routes=nats://@nats:6222"
+      networks:
+        default:
+          external:
+            name: nats
+      EOF
+      docker-compose -f /usr/share/nats/nats-cluster.yml up -d        
+      # docker run -v /home/azureuser:/appdata -p 50000:50000 mcr.microsoft.com/iotedge/opc-plc:1.0.1-linux-amd64 --aa --ph ${hostn}
     )
 
 final_message: "The system is finally up, after $UPTIME seconds"
