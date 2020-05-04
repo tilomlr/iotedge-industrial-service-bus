@@ -15,8 +15,7 @@
 This section refers to the folder structure under `src/`.
 
 - `src/deployment` contains all deployment scripts
-- `src/iotedge` contains a RabbitMQ implementation and tests as well as deployment manifests
-- `src/iotedgeNats` contains a NATS implementation with a Modbus example
+- `src/iotedge` contains the actual implementation and tests as well as deployment manifests
 - `src/rabbitmq-federation` contains the Dockerfile based on the official RabbitMQ base image. It enables the [RabbitMQ federation plugin](https://www.rabbitmq.com/federation.html).
 
 ## Implementation Details
