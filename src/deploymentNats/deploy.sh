@@ -1,10 +1,45 @@
 #!/bin/bash
-
-
+###################################################################
+#Script Name	: ISB Installer                                                                                      
+#Description	: this script installs the demo infrastructure on Azure with a running ISBWriter and ISBReader example
+#Args           :                                                                                           
+###################################################################
+# Coloring
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+echo -e "${GREEN}"
+echo -e ' _____  _____ ____  '
+echo -e '|_   _|/ ____|  _ \ '
+echo -e '  | | | (___ | |_) |'
+echo -e '  | |  \___ \|  _ < '
+echo -e ' _| |_ ____) | |_) |'
+echo -e '|_____|_____/|____/ '
+echo -e '                    '
+echo -e '                    '
+echo -e ' _____ _   _  _____ _______       _      _      ______ _____  '
+echo -e '|_   _| \ | |/ ____|__   __|/\   | |    | |    |  ____|  __ \ '
+echo -e '  | | |  \| | (___    | |  /  \  | |    | |    | |__  | |__) |'
+echo -e '  | | | . ` |\___ \   | | / /\ \ | |    | |    |  __| |  _  / '
+echo -e ' _| |_| |\  |____) |  | |/ ____ \| |____| |____| |____| | \ \ '
+echo -e '|_____|_| \_|_____/   |_/_/    \_\______|______|______|_|  \_\'
+# Errorhandler
+set -e
+trap 'catch $? $LINENO' EXIT
+catch() {
+  echo "catching!"
+  if [ "$1" != "0" ]; then
+    # error handling goes here
+    echo "Error $1 occurred on $2"
+  fi
+}
+# Functions
 getRandomString() {
   sed "s/[^a-zA-Z0-9]//g" <<< $(openssl rand -base64 4) | tr '[:upper:]' '[:lower:]'
 }
 
+##  EDGE RUNTIME
 deployIoTEdge() {
   # Create an IoT Edge virtual machine and configure IoT Edge
   az vm create --resource-group ${RG_NAME} --name $1 --image UbuntuLTS \
@@ -30,24 +65,25 @@ deployPlc() {
     --generate-ssh-keys --size ${VM_SIZE} --custom-data ${CLOUD_INIT_PLC} --admin-username ${ADMIN_USERNAME} --no-wait
 }
 
+## ISB
 deployISB() {
   az vm create --resource-group ${RG_NAME} --name $1 --image UbuntuLTS \
     --vnet-name ${VNET_NAME} --subnet ${SUBNET_NAME} --nsg ${NSG_NAME} --public-ip-address "" \
     --generate-ssh-keys --size ${VM_SIZE} --custom-data ${CLOUD_INIT_ISB} --admin-username ${ADMIN_USERNAME} --no-wait
 }
 
-
+# VARS
 RG_NAME=rg-iotedge-industrial-service-bus
 VNET_NAME=isb-demo-vnet
 SUBNET_NAME=isb-demo-subnet
 NSG_NAME=isb-demo-nsg
-BASTION_PUBLIC_IP=isb-bastion-piblic-ip-$(getRandomString)
+BASTION_PUBLIC_IP=isb-bastion-public-ip
 VM_SIZE=Standard_B1ms
 IOT_EDGE_VM_NAME_PREFIX=isb-demo-iotedge
 ISB_VM_NAME_PREFIX=isb-demo-nats
 PLC_VM_NAME_PREFIX=isb-demo-plc
-ISB_IOT_HUB=isb-demo-iot-hub-$(getRandomString)
-BASTION_NAME=isb-azure-bastion-$(getRandomString)
+ISB_IOT_HUB=isb-demo-iot-hub
+BASTION_NAME=isb-azure-bastion
 CLOUD_INIT_PLC=cloud-init-plc.yml
 CLOUD_INIT_IOT_EDGE=cloud-init-iotedge.yml
 ADMIN_USERNAME=azureuser
@@ -62,15 +98,7 @@ az extension add --name azure-cli-iot-ext
 # Remove old .env file
 rm .env
 
-set -e
-trap 'catch $?' EXIT
-catch() {
-  # echo "catching!"
-  if [ "$1" != "0" ]; then
-    # error handling goes here
-    echo "Error $1 occurred"
-  fi
-}
+
 
 # Login and optinaly set subscription
 az login
