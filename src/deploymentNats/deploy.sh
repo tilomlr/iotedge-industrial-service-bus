@@ -26,11 +26,12 @@ echo -e '  | | | . ` |\___ \   | | / /\ \ | |    | |    |  __| |  _  / '
 echo -e ' _| |_| |\  |____) |  | |/ ____ \| |____| |____| |____| | \ \ '
 echo -e '|_____|_| \_|_____/   |_/_/    \_\______|______|______|_|  \_\'
 # Errorhandler
+
 set -e
 trap 'catch $? $LINENO' EXIT
 catch() {
-  echo "catching!"
-  if [ "$1" != "0" ]; then
+    echo "catching!"
+      if [ "$1" != "0" ]; then
     # error handling goes here
     echo "Error $1 occurred on $2"
   fi
@@ -97,7 +98,7 @@ az extension add --name azure-iot
 az extension add --name azure-cli-iot-ext
 
 # Remove old .env file
-rm .env
+#rm .env
 
 
 
@@ -143,12 +144,14 @@ az network bastion create --name ${BASTION_NAME} --public-ip-address ${BASTION_P
 # deployPlc ${PLC_VM_NAME_PREFIX}-1
 # deployPlc ${PLC_VM_NAME_PREFIX}-2
 
-deployISB ${ISB_VM_NAME_PREFIX}-1
+
 
 # Prepare IoT Edge Devices
 
 deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-1 ${IOT_EDGE_WRITER_DEPLOYMENT}
 deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-2 ${IOT_EDGE_READER_DEPLOYMENT}
+
+deployISB ${ISB_VM_NAME_PREFIX}-1
 
 # Write .env file
 echo "ISB_IOT_HUB=${ISB_IOT_HUB}" >> .env
