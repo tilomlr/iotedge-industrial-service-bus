@@ -1,10 +1,11 @@
 #!/bin/bash
+
 ###################################################################
 #Script Name	: ISB Installer                                                                                      
 #Description	: this script installs the demo infrastructure on Azure with a running ISBWriter and ISBReader example
 #Args           :                                                                                           
 ###################################################################
-# Coloring
+#Coloring
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
@@ -38,7 +39,6 @@ catch() {
 getRandomString() {
   sed "s/[^a-zA-Z0-9]//g" <<< $(openssl rand -base64 4) | tr '[:upper:]' '[:lower:]'
 }
-
 ##  EDGE RUNTIME
 deployIoTEdge() {
   # Create an IoT Edge virtual machine and configure IoT Edge
@@ -85,6 +85,7 @@ PLC_VM_NAME_PREFIX=isb-demo-plc
 ISB_IOT_HUB=isb-demo-iot-hub
 BASTION_NAME=isb-azure-bastion
 CLOUD_INIT_PLC=cloud-init-plc.yml
+CLOUD_INIT_ISB=cloud-init-isb.yml
 CLOUD_INIT_IOT_EDGE=cloud-init-iotedge.yml
 ADMIN_USERNAME=azureuser
 IOT_EDGE_READER_DEPLOYMENT="../iotedgeNats/config/deployment.isbreader.amd64.json"
