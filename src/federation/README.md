@@ -39,7 +39,7 @@ Both options use the [Sidecar pattern](https://docs.microsoft.com/en-us/azure/ar
 
 Right now, [RabbitMQ](https://www.rabbitmq.com/) is used as the underlying message broker.
 Since we use Dapr we can easily switch to another implementation (e.g. [NATS.io](https://nats.io/)) by simply modifying the [Dapr component configuration](iotedge/modules/ISBWriter/components/rabbitmq.yaml) without any changes to the application itself.  
-In order to configure Federation of multiple RabbitMQ broker instances (two _Writers_, one _Reader_) the _RabbitMQManager_ module is used. It reads federation configuration from the IoT Edge Module Twin and applies it to the target broker instance at runtime. Unit tests for this module can be found in the `src/iotedge/tests` directory.
+In order to configure Federation of multiple RabbitMQ broker instances (two _Writers_, one _Reader_) the _RabbitMQManager_ module is used. It reads federation configuration from the IoT Edge Module Twin and applies it to the target broker instance at runtime. Unit tests for this module can be found in the `src/federation/iotedge/tests` directory.
 
 There are two deployment __templates__ for _Reader_ and _Writer_ roles respectively:
 
