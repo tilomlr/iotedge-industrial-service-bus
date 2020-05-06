@@ -145,8 +145,7 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "modbusToISBWriter": "FROM /messages/modules/Modbus/outputs/modbusOutput/* INTO BrokeredEndpoint(\"/modules/isbwriter/inputs/input1\")",
-          "ModbussimulatorToIoTHub": "FROM /messages/modules/Modbussimulator/outputs/* INTO $upstream",
+          "modbusToISBWriter": "FROM /messages/modules/Modbus/outputs/modbusOutput/* INTO BrokeredEndpoint(\"/modules/isbwriter/inputs/input1\")",          
           "ISBReaderToIoTHub": "FROM /messages/modules/isbreader/outputs/* INTO $upstream",
           "ISBReaderToSQLFunction": "FROM /messages/modules/isbreader/outputs/* INTO BrokeredEndpoint(\"/modules/sqlfunction/inputs/input1\")"
         },
@@ -170,7 +169,7 @@
                 "UnitId": "1"
               }
             },
-            "SlaveConnection": "104.214.227.142"
+            "SlaveConnection": "10.0.0.4"
           }
         }
       }

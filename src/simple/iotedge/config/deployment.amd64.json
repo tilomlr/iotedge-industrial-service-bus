@@ -44,7 +44,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "rdscompany/isbwriter:0.0.2-amd64",
+              "image": "rdscompany/isbwriter:0.0.4-amd64",
               "createOptions": "{\"Env\":[\"TOPIC=modbus-data\"]}"
             }
           },
@@ -94,7 +94,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "rdscompany/isbreader:0.0.3-amd64",
+              "image": "rdscompany/isbreader:0.0.6-amd64",
               "createOptions": "{\"Env\":[\"TOPIC=modbus-data\"]}"
             }
           }
@@ -106,7 +106,6 @@
         "schemaVersion": "1.0",
         "routes": {
           "modbusToISBWriter": "FROM /messages/modules/Modbus/outputs/modbusOutput/* INTO BrokeredEndpoint(\"/modules/isbwriter/inputs/input1\")",
-          "ModbussimulatorToIoTHub": "FROM /messages/modules/Modbussimulator/outputs/* INTO $upstream",
           "ISBReaderToIoTHub": "FROM /messages/modules/isbreader/outputs/* INTO $upstream",
           "ISBReaderToSQLFunction": "FROM /messages/modules/isbreader/outputs/* INTO BrokeredEndpoint(\"/modules/sqlfunction/inputs/input1\")"
         },
@@ -130,7 +129,7 @@
                 "UnitId": "1"
               }
             },
-            "SlaveConnection": "104.214.227.142"
+            "SlaveConnection": "10.0.0.4"
           }
         }
       }

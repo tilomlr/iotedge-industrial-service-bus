@@ -47,25 +47,26 @@ deployIoTEdge() {
 
   echo -e "${GREEN}\n\nCreate VM... ${NC}"
   echo -e "${YELLOW}"
-
   az vm create --resource-group ${RG_NAME} --name $1 --image UbuntuLTS \
     --vnet-name ${VNET_NAME} --subnet ${SUBNET_NAME} --nsg ${NSG_NAME} --public-ip-address "" \
     --generate-ssh-keys --size ${VM_SIZE} --admin-username ${ADMIN_USERNAME} --custom-data ${CLOUD_INIT_IOT_EDGE}
+  echo -e "${NC}"
 
   echo -e "${GREEN}\n\nCreate IoT Hub identity... ${NC}"
   echo -e "${YELLOW}"
-
   # Create IoT Edge identity in IoT Hub
   az iot hub device-identity create -n ${ISB_IOT_HUB} -d $1 --ee
-
+  echo -e "${NC}"
+  
   echo -e "${GREEN}\n\nDeploy Edge Modules.. ${NC}"
   echo -e "${YELLOW}"
-
-
   # Deploy edge modules
   az iot edge deployment create -d $1 -n ${ISB_IOT_HUB} \
     --content $2 --target-condition "deviceId='$1'" --priority 10
+  echo -e "${NC}"
 
+  echo -e "${GREEN}\n\nDeploy Edge Modules.. ${NC}"
+  echo -e "${YELLOW}"
   local connectionString=$(az iot hub device-identity show-connection-string --device-id $1 --hub-name ${ISB_IOT_HUB} -o tsv)
   az vm run-command invoke -g ${RG_NAME} -n $1 \
     --command-id RunShellScript --script "/etc/iotedge/configedge.sh '${connectionString}'"
@@ -91,6 +92,12 @@ deployISB() {
   az vm create --resource-group ${RG_NAME} --name $1 --image UbuntuLTS \
     --vnet-name ${VNET_NAME} --subnet ${SUBNET_NAME} --nsg ${NSG_NAME} --public-ip-address "" \
     --generate-ssh-keys --size ${VM_SIZE} --custom-data ${CLOUD_INIT_ISB} --admin-username ${ADMIN_USERNAME} --no-wait
+  
+  echo -e "${GREEN}\n\nCreate VM ISB... ${NC}"
+  echo -e "${YELLOW}"
+  # start up nats cluster
+  az vm run-command invoke -g ${RG_NAME} -n $1 \
+    --command-id RunShellScript --script "/usr/share/nats/startup.sh"
 }
 
 # VARS

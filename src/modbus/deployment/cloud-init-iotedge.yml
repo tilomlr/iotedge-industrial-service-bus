@@ -41,9 +41,6 @@ runcmd:
 
       apt install iotedge
     )
-  # change this to git clone as soon as the repo is public
-  - wget https://vislepakazurecli.blob.core.windows.net/isb/${hostn}-pn.json -O /home/azureuser/pn.json
-
 write_files:
   - owner: root:root
     path: /etc/iotedge/configedge.sh

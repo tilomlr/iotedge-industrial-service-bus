@@ -41,8 +41,7 @@ runcmd:
 
       apt install iotedge
     )
-  # change this to git clone as soon as the repo is public
-  - wget https://vislepakazurecli.blob.core.windows.net/isb/${hostn}-pn.json -O /home/azureuser/pn.json
+ 
 
 write_files:
   - owner: root:root
@@ -78,5 +77,34 @@ write_files:
       sudo systemctl restart iotedge
 
       echo " $(date) Connection string set to $connectionString"
-
+  - owner: root:root
+    path: /usr/share/nats/nats-cluster.yml
+    permissions: "0755"
+    content: |
+      version: "3"
+      services:
+        nats:
+          image: nats-streaming
+          ports:
+            - "8222:8222"
+            - "4222:4222"
+        nats-1:
+          image: nats
+          command: "--cluster nats://0.0.0.0:6222 --routes=nats://nats:6222"
+        nats-2:
+          image: nats
+          command: "--cluster nats://0.0.0.0:6222 --routes=nats://@nats:6222"
+      networks:
+        default:
+          external:
+            name: nats
+  - owner: root:root
+    path: /usr/share/nats/startup.sh
+    permissions: "0755"
+    content: |
+      #!/bin/bash
+      docker network create nats
+      curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+      chmod +x /usr/local/bin/docker-compose 
+      docker-compose -f /usr/share/nats/nats-cluster.yml up -d
 final_message: "The system is finally up, after $UPTIME seconds"

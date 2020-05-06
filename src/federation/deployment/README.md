@@ -4,7 +4,7 @@
 
 The following resources will be created:
 
-- 5 Ubuntu VMs (3 x IoT Edge, 2 x PLC Simulation) of size _Standard_B1ms_
+- 1 Ubuntu VMs  of size _Standard_B1ms_
 - 1 x VNET with two Subnets
 - 1 x Azure Bastion with public IP
 - 1 x IoT Hub of size _S1_
@@ -29,6 +29,8 @@ docker run -v C:\<path-to-the-src-folder-in-this-github-repo>:/isb -it mcr.micro
 You will have all files available under `/isb` inside the container.
 
 > Hint: if you cloned this repo in Windows and want to run it in a Linux environment, you will need to chnage the line endings in shell scripts from `CRLF` to `LF`
+
+e.g.  DOS to Linux `tr -d '\r' < deploy.sh > deployLinux.sh`
 
 ## Run Deployment
 

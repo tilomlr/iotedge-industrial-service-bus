@@ -40,9 +40,15 @@ runcmd:
         sleep 3
       done
       
-      docker network create nats
-      touch /usr/share/nats-cluster.yml
-      cat  <<EOF > /usr/share/nats-cluster.yml
+      docker network create nats      
+      docker-compose -f /usr/share/nats/nats-cluster.yml up -d        
+      # docker run -v /home/azureuser:/appdata -p 50000:50000 mcr.microsoft.com/iotedge/opc-plc:1.0.1-linux-amd64 --aa --ph ${hostn}
+    )
+write_files:
+  - owner: root:root
+    path: /usr/share/nats/nats-cluster.yml
+    permissions: "0755"
+    content: |
       version: "3"
       services:
         nats:
@@ -59,10 +65,5 @@ runcmd:
       networks:
         default:
           external:
-            name: nats
-      EOF
-      docker-compose -f /usr/share/nats/nats-cluster.yml up -d        
-      # docker run -v /home/azureuser:/appdata -p 50000:50000 mcr.microsoft.com/iotedge/opc-plc:1.0.1-linux-amd64 --aa --ph ${hostn}
-    )
-
+            name: nats  
 final_message: "The system is finally up, after $UPTIME seconds"

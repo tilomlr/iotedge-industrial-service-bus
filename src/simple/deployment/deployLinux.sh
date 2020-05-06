@@ -55,9 +55,14 @@ deployIoTEdge() {
   az iot edge deployment create -d $1 -n ${ISB_IOT_HUB} \
     --content $2 --target-condition "deviceId='$1'" --priority 10
 
+  # set IoT Hub connection string
   local connectionString=$(az iot hub device-identity show-connection-string --device-id $1 --hub-name ${ISB_IOT_HUB} -o tsv)
   az vm run-command invoke -g ${RG_NAME} -n $1 \
     --command-id RunShellScript --script "/etc/iotedge/configedge.sh '${connectionString}'"
+
+  # start up nats cluster
+  az vm run-command invoke -g ${RG_NAME} -n $1 \
+    --command-id RunShellScript --script "/usr/share/nats/startup.sh"
 }
 
 
@@ -146,7 +151,6 @@ echo -e "${NC}"
 deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-1 ${IOT_EDGE_DEPLOYMENT}
 
 
-deployISB ${ISB_VM_NAME_PREFIX}-1
 
 # Write .env file
 echo "ISB_IOT_HUB=${ISB_IOT_HUB}" >> .env
