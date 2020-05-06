@@ -22,7 +22,8 @@ The code for an initial fast-start implementation can be found in the [source ("
 
 ### Technical Implementation
 
-- [Code example with IoT Edge](src/README.md)
+- [Code example with RabbitMQ, OPC/UA and IoT Edge](src/example1/README.md)
+- [Code example with Modbus, NATS and IOT Edge](src/example2/README.md)
 
 ## What This Repository ___is not___
 
