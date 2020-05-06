@@ -10,7 +10,7 @@ At the initial design workshop, we had more than 30+ participants from various c
 
 The diagram shows the overall architecture and parts of the framework functionality.
 It is explained in detail in the [documentation ("docs")](docs/README.md).  
-The code for an initial fast-start implementation can be found in the [source ("src")](src/README.md) section.
+The code for an initial fast-start implementation can be found in the [source ("src")](src/simple/README.md) section.
 
 ## Content
 
@@ -23,7 +23,7 @@ The code for an initial fast-start implementation can be found in the [source ("
 ### Technical Implementation
 
 - [Code example with RabbitMQ, OPC/UA and IoT Edge](src/federation/README.md)
-- [Code example with Modbus, NATS and IoT Edge](src/example2/README.md)
+- [Code example with Modbus, NATS and IoT Edge](src/modbus/README.md)
 
 ## What This Repository ___is not___
 
