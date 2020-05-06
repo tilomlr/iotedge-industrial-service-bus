@@ -12,10 +12,10 @@
 
 ## Folder Structure
 
-This section refers to the folder structure under `src/`.
+This section refers to the folder structure under `src/simple`.
 
-- `src/modbus/deployment` contains all deployment scripts
-- `src/modbus/iotedge` contains a RabbitMQ implementation and tests as well as deployment manifests
+- `src/simple/deployment` contains all deployment scripts
+- `src/simple/iotedge` contains a RabbitMQ implementation and tests as well as deployment manifests
 
 
 ## Implementation Details
@@ -25,9 +25,9 @@ In fact these roles are represented by IoT Edge modules, the `ISBWriter` and `IS
 The _Writer_ is responsible for reading data from a simulated PLC via OPC UA and __writing__ this data into the ISB using [Dapr](https://dapr.io/) [PubSub](https://github.com/dapr/samples/tree/master/4.pub-sub).  
 The _Reader_ on the other hand is responsible for __reading__ data from the ISB, again using Dapr PubSub, and forwarding it to IoT Hub.
 
-The following diagram shows the interaction between different IoT Edge modules and Dapr. In the demo setup `ISBReader` and `ISBWriter` modules are deployed to different IoT Edge nodes for the sake of demonstration (see [deployment diagram](deployment/img/deployment_diagram.PNG)).
+The following diagram shows the interaction between different IoT Edge modules and Dapr. In the demo setup `ISBReader` and `ISBWriter` modules are deployed to different IoT Edge nodes for the sake of demonstration (see [deployment diagram](deployment/img/deployment.PNG)).
 
-![ISB Implementation with IoT Edge](img/isb_iotedge1.png)
+![ISB Implementation with IoT Edge](../img/isb_iotedge1.png)
 
 Dapr currently supports two modes of operation:
 
@@ -48,5 +48,5 @@ There are two deployment __templates__ for _Reader_ and _Writer_ roles respectiv
 
 They define IoT Edge modules for each role.
 
-> Also, the generated deployment __manifests__ under `src/federation/iotedge/config` are part of this repository, even though normally one would not check them in.
+> Also, the generated deployment __manifests__ under `src/simple/iotedge/config` are part of this repository, even though normally one would not check them in.
 This is done on purpose to get you up and running with as little effort as possible.
