@@ -61,6 +61,7 @@ deployIoTEdge() {
   echo -e "${GREEN}\n\nDeploy Edge Modules.. ${NC}"
   echo -e "${YELLOW}"
 
+
   # Deploy edge modules
   az iot edge deployment create -d $1 -n ${ISB_IOT_HUB} \
     --content $2 --target-condition "deviceId='$1'" --priority 10
@@ -108,8 +109,8 @@ CLOUD_INIT_PLC=cloud-init-plc.yml
 CLOUD_INIT_ISB=cloud-init-isb.yml
 CLOUD_INIT_IOT_EDGE=cloud-init-iotedge.yml
 ADMIN_USERNAME=azureuser
-IOT_EDGE_READER_DEPLOYMENT="../iotedgeNats/config/deployment.isbreader.amd64.json"
-IOT_EDGE_WRITER_DEPLOYMENT="../iotedgeNats/config/deployment.isbwriter.amd64.json"
+IOT_EDGE_READER_DEPLOYMENT="../iotedge/config/deployment.isbreader.amd64.json"
+IOT_EDGE_WRITER_DEPLOYMENT="../iotedge/config/deployment.isbwriter.amd64.json"
 
 
 # Install extensions
@@ -149,21 +150,21 @@ echo -e "${YELLOW}"
 az iot hub create --resource-group ${RG_NAME} --name ${ISB_IOT_HUB} --sku S1
 echo -e "${NC}"
 
-echo -e "${GREEN}\n\nCreate Resource Group... ${NC}"
+echo -e "${GREEN}\n\nCreate virtual network and vnet... ${NC}"
 echo -e "${YELLOW}"
-# Create a virtual network and front-end subnet.
+# Create a virtual network and subnet.
 az network vnet create --resource-group ${RG_NAME} --name ${VNET_NAME} --address-prefix 10.0.0.0/16 \
   --subnet-name ${SUBNET_NAME} --subnet-prefix 10.0.0.0/24
 echo -e "${NC}"
 
-echo -e "${GREEN}\n\nCreate Resource Group... ${NC}"
+echo -e "${GREEN}\n\nCreate azure bastion subnet... ${NC}"
 echo -e "${YELLOW}"
 # Create AzureBastionSubnet
 az network vnet subnet create --resource-group ${RG_NAME} --vnet-name ${VNET_NAME} \
   --name AzureBastionSubnet --address-prefix 10.0.1.0/27
 echo -e "${NC}"
 
-echo -e "${GREEN}\n\nCreate Resource Group... ${NC}"
+echo -e "${GREEN}\n\nCreate public ip... ${NC}"
 echo -e "${YELLOW}"
 # Create public IP for Azure Bastion
 az network public-ip create --resource-group ${RG_NAME} --name ${BASTION_PUBLIC_IP} \

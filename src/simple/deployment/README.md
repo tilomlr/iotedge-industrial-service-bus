@@ -83,3 +83,4 @@ Still, with ISB it is easy to consume this data without having any knowledge whe
   - You can read IoT Edge logs using `iotedge logs <module_name>`
   - You can request logs upload to a storage account using this [direct method on edgeAgent](https://github.com/Azure/iotedge/blob/master/doc/built-in-logs-pull.md)
 - In case you don't see the data flowing after a successful deployment try to re-run `restart-dapr.sh`
+

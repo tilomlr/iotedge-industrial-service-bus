@@ -42,3 +42,7 @@ The code for an initial fast-start implementation can be found in the [source ("
 - Bringing [Grafana](https://grafana.com/) with [SQL Server Edge](https://azure.microsoft.com/de-de/services/sql-database-edge/) to Azure IoT Edge
 - Creating an easy-to-use Visual Data Analytics module
 - Many more
+
+## Todo
+
+- Hints for deployment trouble shooting: PGP keys changed for repository??
