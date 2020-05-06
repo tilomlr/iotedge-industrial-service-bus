@@ -14,9 +14,8 @@
 
 This section refers to the folder structure under `src/`.
 
-- `src/deployment` contains all deployment scripts
-- `src/iotedge` contains a RabbitMQ implementation and tests as well as deployment manifests
-- `src/iotedgeNats` contains a NATS implementation with a Modbus example
+- `src/federation/deployment` contains all deployment scripts
+- `src/federation/iotedge` contains a RabbitMQ implementation and tests as well as deployment manifests
 - `src/rabbitmq-federation` contains the Dockerfile based on the official RabbitMQ base image. It enables the [RabbitMQ federation plugin](https://www.rabbitmq.com/federation.html).
 
 ## Implementation Details
@@ -49,5 +48,5 @@ There are two deployment __templates__ for _Reader_ and _Writer_ roles respectiv
 
 They define IoT Edge modules for each role.
 
-> Also, the generated deployment __manifests__ under `src/iotedge/config` are part of this repository, even though normally one would not check them in.
+> Also, the generated deployment __manifests__ under `src/federation/iotedge/config` are part of this repository, even though normally one would not check them in.
 This is done on purpose to get you up and running with as little effort as possible.

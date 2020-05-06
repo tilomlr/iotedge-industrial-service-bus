@@ -27,7 +27,7 @@ As depicted, a fundamental functionality of the ISB is to collect the data from 
 
 Here, every IoT Edge installation is part of the ISB (i.e. a module of the messaging system like _RabbitMQ_ is running locally) and data is shared across all devices.
 The ISB participants can be connected via federation, which acts as a redundant data storage between the devices.
-This is demonstrated by the example in the [source ("src")](../src/deployment/README.md) section.
+This is demonstrated by the example in the [source ("src")](../src/federation/deployment/README.md) section.
 
 ![ISB with RabbitMQ Federation](img/federation.jpg)
 
@@ -41,7 +41,7 @@ One of the most important core features is the independency from specific implem
 To be independent of a specific ISB messaging system implementation (like _RabbitMQ_, _NATS.io_ or other commercially available products) an abstraction layer based on [Dapr (Distributed Application Runtime)](https://dapr.io/) is used.  
 The idea is to have a generic module available, which can push to and read data from the ISB without being dependent on APIs provided by a specific ISB implementation.
 In our example, we can use simple REST calls to send and receive data from _RabbitMQ_.  
-More details about the example implementation can be found [here](../src/README.md).
+More details about the example implementation can be found [here](../src/federaion/README.md).
 
 ## Summary
 
