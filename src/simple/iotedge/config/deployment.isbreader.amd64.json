@@ -1,0 +1,87 @@
+{
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": ""
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0.9",
+              "createOptions": "{}"
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0.9"
+            }
+          }
+        },
+        "modules": {
+          "sql": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "microsoft/mssql-server-linux:2017-latest",
+              "createOptions": "{\"Env\":[\"ACCEPT_EULA=Y\",\"MSSQL_SA_PASSWORD=Strong!Passw0rd\"],\"HostConfig\":{\"Mounts\":[{\"Source\":\"sqlVolume\",\"Target\":\"/var/opt/mssql\",\"Type\":\"volume\"}],\"PortBindings\":{\"1433/tcp\":[{\"HostPort\":\"1433\"}]}}}"
+            }
+          },
+          "sqlfunction": {
+            "version": "2.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "rdscompany/isbsqlfunction:0.0.25-amd64",
+              "createOptions": "{}"
+            }
+          },
+          "isbreader": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "rdscompany/isbreader:0.0.3-amd64",
+              "createOptions": "{\"Env\":[\"TOPIC=opc-data\"]}"
+            }
+          },
+          "redis": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "redis",
+              "createOptions": "{}"
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "ISBReaderToIoTHub": "FROM /messages/modules/isbreader/outputs/* INTO $upstream",
+          "ISBReaderToSQLFunction": "FROM /messages/modules/isbreader/outputs/* INTO BrokeredEndpoint(\"/modules/sqlfunction/inputs/input1\")"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    }
+  }
+}
