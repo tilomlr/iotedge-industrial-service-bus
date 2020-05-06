@@ -25,6 +25,7 @@ echo -e '  | | |  \| | (___    | |  /  \  | |    | |    | |__  | |__) |'
 echo -e '  | | | . ` |\___ \   | | / /\ \ | |    | |    |  __| |  _  / '
 echo -e ' _| |_| |\  |____) |  | |/ ____ \| |____| |____| |____| | \ \ '
 echo -e '|_____|_| \_|_____/   |_/_/    \_\______|______|______|_|  \_\'
+
 # Errorhandler
 
 set -e
@@ -59,19 +60,7 @@ deployIoTEdge() {
     --command-id RunShellScript --script "/etc/iotedge/configedge.sh '${connectionString}'"
 }
 
-deployPlc() {
-  # Create a PLC virtual machine
-  az vm create --resource-group ${RG_NAME} --name $1 --image UbuntuLTS \
-    --vnet-name ${VNET_NAME} --subnet ${SUBNET_NAME} --nsg ${NSG_NAME} --public-ip-address "" \
-    --generate-ssh-keys --size ${VM_SIZE} --custom-data ${CLOUD_INIT_PLC} --admin-username ${ADMIN_USERNAME} --no-wait
-}
 
-## ISB
-deployISB() {
-  az vm create --resource-group ${RG_NAME} --name $1 --image UbuntuLTS \
-    --vnet-name ${VNET_NAME} --subnet ${SUBNET_NAME} --nsg ${NSG_NAME} --public-ip-address "" \
-    --generate-ssh-keys --size ${VM_SIZE} --custom-data ${CLOUD_INIT_ISB} --admin-username ${ADMIN_USERNAME} --no-wait
-}
 
 # VARS
 RG_NAME=rg-iotedge-industrial-service-bus
@@ -80,17 +69,13 @@ SUBNET_NAME=isb-demo-subnet
 NSG_NAME=isb-demo-nsg
 BASTION_PUBLIC_IP=isb-bastion-public-ip
 VM_SIZE=Standard_B1ms
-IOT_EDGE_VM_NAME_PREFIX=isb-demo-iotedge
-ISB_VM_NAME_PREFIX=isb-demo-nats
-PLC_VM_NAME_PREFIX=isb-demo-plc
+IOT_EDGE_VM_NAME_PREFIX=isb-demo
 ISB_IOT_HUB=isb-demo-iot-hub
 BASTION_NAME=isb-azure-bastion
-CLOUD_INIT_PLC=cloud-init-plc.yml
-CLOUD_INIT_ISB=cloud-init-isb.yml
 CLOUD_INIT_IOT_EDGE=cloud-init-iotedge.yml
 ADMIN_USERNAME=azureuser
-IOT_EDGE_READER_DEPLOYMENT="../iotedgeNats/config/deployment.isbreader.amd64.json"
-IOT_EDGE_WRITER_DEPLOYMENT="../iotedgeNats/config/deployment.isbwriter.amd64.json"
+IOT_EDGE_DEPLOYMENT="../iotedge/config/deployment.amd64.json"
+
 
 
 # Install extensions
@@ -99,8 +84,6 @@ az extension add --name azure-cli-iot-ext
 
 # Remove old .env file
 #rm .env
-
-
 
 # Login and optinaly set subscription
 az login
@@ -140,24 +123,17 @@ az network public-ip create --resource-group ${RG_NAME} --name ${BASTION_PUBLIC_
 az network bastion create --name ${BASTION_NAME} --public-ip-address ${BASTION_PUBLIC_IP} \
   --resource-group ${RG_NAME} --vnet-name ${VNET_NAME}
 
-# Prepare PLCs
-# deployPlc ${PLC_VM_NAME_PREFIX}-1
-# deployPlc ${PLC_VM_NAME_PREFIX}-2
-
-
 
 # Prepare IoT Edge Devices
 
-deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-1 ${IOT_EDGE_WRITER_DEPLOYMENT}
-deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-2 ${IOT_EDGE_READER_DEPLOYMENT}
+deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-1 ${IOT_EDGE_DEPLOYMENT}
+
 
 deployISB ${ISB_VM_NAME_PREFIX}-1
 
 # Write .env file
 echo "ISB_IOT_HUB=${ISB_IOT_HUB}" >> .env
 echo "IOT_EDGE_1=${IOT_EDGE_VM_NAME_PREFIX}-1" >> .env
-echo "IOT_EDGE_2=${IOT_EDGE_VM_NAME_PREFIX}-2" >> .env
-
 
 # Restart Dapr modules as a workaround for Dapr not yet implementing decent retry mechanism for reconenctions to a pub/sub broker
 ./restart-dapr.sh

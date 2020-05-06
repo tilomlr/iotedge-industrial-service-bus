@@ -82,6 +82,61 @@
                 }
               }
             }
+          },
+          "sql": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "microsoft/mssql-server-linux:2017-latest",
+              "createOptions": {
+                "Env": [
+                  "ACCEPT_EULA=Y",
+                  "MSSQL_SA_PASSWORD=Strong!Passw0rd"
+                ],
+                "HostConfig": {
+                  "Mounts": [
+                    {
+                      "Source": "sqlVolume",
+                      "Target": "/var/opt/mssql",
+                      "Type": "volume"
+                    }
+                  ],
+                  "PortBindings": {
+                    "1433/tcp": [
+                      {
+                        "HostPort": "1433"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "sqlfunction": {
+            "version": "2.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.sqlfunction}",
+              "createOptions": {}
+            }
+          },
+          "isbreader": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.ISBReader}",
+              "createOptions": {
+                "Env": [
+                  "TOPIC=modbus-data"
+                ]
+              }
+            }
           }
         }
       }
@@ -91,7 +146,9 @@
         "schemaVersion": "1.0",
         "routes": {
           "modbusToISBWriter": "FROM /messages/modules/Modbus/outputs/modbusOutput/* INTO BrokeredEndpoint(\"/modules/isbwriter/inputs/input1\")",
-          "ModbussimulatorToIoTHub": "FROM /messages/modules/Modbussimulator/outputs/* INTO $upstream"
+          "ModbussimulatorToIoTHub": "FROM /messages/modules/Modbussimulator/outputs/* INTO $upstream",
+          "ISBReaderToIoTHub": "FROM /messages/modules/isbreader/outputs/* INTO $upstream",
+          "ISBReaderToSQLFunction": "FROM /messages/modules/isbreader/outputs/* INTO BrokeredEndpoint(\"/modules/sqlfunction/inputs/input1\")"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200

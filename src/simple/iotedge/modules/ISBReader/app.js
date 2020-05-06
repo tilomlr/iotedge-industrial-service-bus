@@ -20,6 +20,7 @@ app.get('/dapr/subscribe', (_req, res) => {
   ]);
 });
 
+
 Client.fromEnvironment(Transport, function (err, client) {
   if (err) {
     throw err;
@@ -63,5 +64,7 @@ function handleServiceBusMessage(request, result, client) {
     });
   }
 }
+
+
 
 app.listen(port, () => console.log(`Node App listening on port ${port}!`));

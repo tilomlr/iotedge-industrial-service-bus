@@ -25,6 +25,7 @@ echo -e '  | | |  \| | (___    | |  /  \  | |    | |    | |__  | |__) |'
 echo -e '  | | | . ` |\___ \   | | / /\ \ | |    | |    |  __| |  _  / '
 echo -e ' _| |_| |\  |____) |  | |/ ____ \| |____| |____| |____| | \ \ '
 echo -e '|_____|_| \_|_____/   |_/_/    \_\______|______|______|_|  \_\'
+
 # Errorhandler
 
 set -e
@@ -43,12 +44,22 @@ getRandomString() {
 ##  EDGE RUNTIME
 deployIoTEdge() {
   # Create an IoT Edge virtual machine and configure IoT Edge
+
+  echo -e "${GREEN}\n\nCreate VM... ${NC}"
+  echo -e "${YELLOW}"
+
   az vm create --resource-group ${RG_NAME} --name $1 --image UbuntuLTS \
     --vnet-name ${VNET_NAME} --subnet ${SUBNET_NAME} --nsg ${NSG_NAME} --public-ip-address "" \
     --generate-ssh-keys --size ${VM_SIZE} --admin-username ${ADMIN_USERNAME} --custom-data ${CLOUD_INIT_IOT_EDGE}
 
+  echo -e "${GREEN}\n\nCreate IoT Hub identity... ${NC}"
+  echo -e "${YELLOW}"
+
   # Create IoT Edge identity in IoT Hub
   az iot hub device-identity create -n ${ISB_IOT_HUB} -d $1 --ee
+
+  echo -e "${GREEN}\n\nDeploy Edge Modules.. ${NC}"
+  echo -e "${YELLOW}"
 
   # Deploy edge modules
   az iot edge deployment create -d $1 -n ${ISB_IOT_HUB} \
@@ -59,15 +70,23 @@ deployIoTEdge() {
     --command-id RunShellScript --script "/etc/iotedge/configedge.sh '${connectionString}'"
 }
 
+
 deployPlc() {
   # Create a PLC virtual machine
+  echo -e "${GREEN}\n\nCreate VM PLC... ${NC}"
+  echo -e "${YELLOW}"
   az vm create --resource-group ${RG_NAME} --name $1 --image UbuntuLTS \
     --vnet-name ${VNET_NAME} --subnet ${SUBNET_NAME} --nsg ${NSG_NAME} --public-ip-address "" \
     --generate-ssh-keys --size ${VM_SIZE} --custom-data ${CLOUD_INIT_PLC} --admin-username ${ADMIN_USERNAME} --no-wait
 }
 
+
 ## ISB
 deployISB() {
+
+  echo -e "${GREEN}\n\nCreate VM ISB... ${NC}"
+  echo -e "${YELLOW}"
+
   az vm create --resource-group ${RG_NAME} --name $1 --image UbuntuLTS \
     --vnet-name ${VNET_NAME} --subnet ${SUBNET_NAME} --nsg ${NSG_NAME} --public-ip-address "" \
     --generate-ssh-keys --size ${VM_SIZE} --custom-data ${CLOUD_INIT_ISB} --admin-username ${ADMIN_USERNAME} --no-wait
@@ -118,42 +137,59 @@ else
   az configure --defaults location=$2
 fi
 
+echo -e "${GREEN}\n\nCreate Resource Group... ${NC}"
+echo -e "${YELLOW}"
 # Create a resource group.
 az group create --name ${RG_NAME}
+echo -e "${NC}"
 
+echo -e "${GREEN}\n\nCreate VM... ${NC}"
+echo -e "${YELLOW}"
 # Create IoT Hub
 az iot hub create --resource-group ${RG_NAME} --name ${ISB_IOT_HUB} --sku S1
+echo -e "${NC}"
 
+echo -e "${GREEN}\n\nCreate Resource Group... ${NC}"
+echo -e "${YELLOW}"
 # Create a virtual network and front-end subnet.
 az network vnet create --resource-group ${RG_NAME} --name ${VNET_NAME} --address-prefix 10.0.0.0/16 \
   --subnet-name ${SUBNET_NAME} --subnet-prefix 10.0.0.0/24
+echo -e "${NC}"
 
+echo -e "${GREEN}\n\nCreate Resource Group... ${NC}"
+echo -e "${YELLOW}"
 # Create AzureBastionSubnet
 az network vnet subnet create --resource-group ${RG_NAME} --vnet-name ${VNET_NAME} \
   --name AzureBastionSubnet --address-prefix 10.0.1.0/27
+echo -e "${NC}"
 
+echo -e "${GREEN}\n\nCreate Resource Group... ${NC}"
+echo -e "${YELLOW}"
 # Create public IP for Azure Bastion
 az network public-ip create --resource-group ${RG_NAME} --name ${BASTION_PUBLIC_IP} \
   --allocation-method Static --sku Standard
+echo -e "${NC}"
 
+echo -e "${GREEN}\n\nCreate Bastion... ${NC}"
+echo -e "${YELLOW}"
 # Create Azure Bastion
 az network bastion create --name ${BASTION_NAME} --public-ip-address ${BASTION_PUBLIC_IP} \
   --resource-group ${RG_NAME} --vnet-name ${VNET_NAME}
+echo -e "${NC}"
 
-# Prepare PLCs
-# deployPlc ${PLC_VM_NAME_PREFIX}-1
-# deployPlc ${PLC_VM_NAME_PREFIX}-2
-
-
-
+echo -e "${GREEN}\n\nCreate Edge Devices... ${NC}"
+echo -e "${YELLOW}"
 # Prepare IoT Edge Devices
-
 deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-1 ${IOT_EDGE_WRITER_DEPLOYMENT}
 deployIoTEdge ${IOT_EDGE_VM_NAME_PREFIX}-2 ${IOT_EDGE_READER_DEPLOYMENT}
+echo -e "${NC}"
 
+echo -e "${GREEN}\n\nCreate ISB Device... ${NC}"
+echo -e "${YELLOW}"
 deployISB ${ISB_VM_NAME_PREFIX}-1
+echo -e "${NC}"
 
-# Write .env file
+
 echo "ISB_IOT_HUB=${ISB_IOT_HUB}" >> .env
 echo "IOT_EDGE_1=${IOT_EDGE_VM_NAME_PREFIX}-1" >> .env
 echo "IOT_EDGE_2=${IOT_EDGE_VM_NAME_PREFIX}-2" >> .env
