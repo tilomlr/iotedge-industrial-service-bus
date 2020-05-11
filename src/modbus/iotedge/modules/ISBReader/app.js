@@ -12,7 +12,7 @@ const port = 3000;
 const topic = process.env.TOPIC;
 
 // Dapr publishes messages with the application/cloudevents+json content-type
-app.use(bodyParser.json({ type: 'application/json' }));
+app.use(bodyParser.json({ type: 'application/*+json' }));
 
 app.get('/dapr/subscribe', (_req, res) => {
   res.json([

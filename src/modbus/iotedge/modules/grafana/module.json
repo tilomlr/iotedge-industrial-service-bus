@@ -2,7 +2,7 @@
     "$schema-version": "0.0.1",
     "description": "",
     "image": {
-        "repository": "$rdscompany/grafana",
+        "repository": "rdscompany/grafana",
         "tag": {
             "version": "0.0.1",
             "platforms": {
