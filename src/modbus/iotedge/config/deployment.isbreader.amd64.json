@@ -7,7 +7,8 @@
           "type": "docker",
           "settings": {
             "minDockerVersion": "v1.25",
-            "loggingOptions": ""
+            "loggingOptions": "",
+            "registryCredentials": {}
           }
         },
         "systemModules": {
@@ -39,13 +40,13 @@
             }
           },
           "grafana": {
-            "version": "0.0.1",
+            "version": "0.0.2",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
               "image": "rdscompany/grafana:0.0.1-amd64",
-              "createOptions": "{}"
+              "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"3000/tcp\":[{\"HostPort\":\"3000\"}]}}}"
             }
           },
           "isbreader": {
@@ -67,6 +68,16 @@
               "image": "redis",
               "createOptions": "{}"
             }
+          },
+          "sql": {
+            "version": "2.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "microsoft/mssql-server-linux:2017-latest",
+              "createOptions": "{\"Env\":[\"ACCEPT_EULA=Y\",\"MSSQL_SA_PASSWORD=Strong!Passw0rd\"],\"HostConfig\":{\"Mounts\":[{\"Source\":\"sqlVolume\",\"Target\":\"/var/opt/mssql\",\"Type\":\"volume\"}],\"PortBindings\":{\"1433/tcp\":[{\"HostPort\":\"1433\"}]}}}"
+            }
           }
         }
       }
@@ -76,7 +87,8 @@
         "schemaVersion": "1.0",
         "routes": {
           "ISBReaderToSQLFunction": "FROM /messages/modules/isbreader/outputs/* INTO BrokeredEndpoint(\"/modules/sqlfunction/inputs/input1\")",
-          "ISBReaderToIoTHub": "FROM /messages/modules/isbreader/outputs/* INTO $upstream"
+          "ISBReaderToIoTHub": "FROM /messages/modules/isbreader/outputs/* INTO $upstream",
+          "sql1ToIoTHub": "FROM /messages/modules/sql1/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200

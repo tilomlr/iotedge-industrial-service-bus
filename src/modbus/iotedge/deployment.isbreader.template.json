@@ -8,7 +8,8 @@
           "type": "docker",
           "settings": {
             "minDockerVersion": "v1.25",
-            "loggingOptions": ""            
+            "loggingOptions": "",
+            "registryCredentials": {}
           }
         },
         "systemModules": {
@@ -28,7 +29,7 @@
             }
           }
         },
-        "modules": {        
+        "modules": {
           "sqlfunction": {
             "version": "2.0",
             "type": "docker",
@@ -40,13 +41,23 @@
             }
           },
           "grafana": {
-            "version": "0.0.1",
+            "version": "0.0.2",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.grafana}",
-              "createOptions": {}
+              "createOptions": {
+                "HostConfig": {                 
+                  "PortBindings": {
+                    "3000/tcp": [
+                      {
+                        "HostPort": "3000"
+                      }
+                    ]
+                  }
+                }
+              }              
             }
           },
           "isbreader": {
@@ -72,45 +83,53 @@
               "image": "redis",
               "createOptions": {}
             }
-          },
-          "AzureSQLDatabaseEdge": {
-            "settings": {
-                "image": "marketplace.azurecr.io/microsoftsqledge-preview/azure-sql-database-edge",
-                "createOptions": "{\"HostConfig\":{\"CapAdd\":[\"SYS_PTRACE\"],\"Binds\":[\"sqlvolume:/sqlvolume\"],\"PortBindings\":{\"1433/tcp\":[{\"HostPort\":\"1433\"}]},\"Mounts\":[{\"Type\":\"volume\",\"Source\":\"sqlvolume\",\"Target\":\"/var/opt/mssql\"}]},\"User\":\"0:0\",\"Env\":[\"MSSQL_AGENT_ENABLED=TRUE\",\"ClientTransportType=AMQP_TCP_Only\",\"MSSQL_PID=Developer\"]}"
-            },
+          },          
+          "sql": {
+            "version": "2.0",
             "type": "docker",
-            "env": {
-                "ACCEPT_EULA": {
-                    "value": "Y"
-                },
-                "SA_PASSWORD": {
-                    "value": "StrongPa$$word"
-                },
-                "MSSQL_LCID": {
-                    "value": "1033"
-                },
-                "MSSQL_COLLATION": {
-                    "value": "SQL_Latin1_General_CP1_CI_AS"
-                }
-            },
             "status": "running",
             "restartPolicy": "always",
-            "version": "1.0"
-        }
+            "settings": {
+              "image": "microsoft/mssql-server-linux:2017-latest",
+              "createOptions": {
+                "Env": [
+                  "ACCEPT_EULA=Y",
+                  "MSSQL_SA_PASSWORD=Strong!Passw0rd"
+                ],
+                "HostConfig": {
+                  "Mounts": [
+                    {
+                      "Source": "sqlVolume",
+                      "Target": "/var/opt/mssql",
+                      "Type": "volume"
+                    }
+                  ],
+                  "PortBindings": {
+                    "1433/tcp": [
+                      {
+                        "HostPort": "1433"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
     "$edgeHub": {
       "properties.desired": {
         "schemaVersion": "1.0",
-        "routes": {          
+        "routes": {
           "ISBReaderToSQLFunction": "FROM /messages/modules/isbreader/outputs/* INTO BrokeredEndpoint(\"/modules/sqlfunction/inputs/input1\")",
-          "ISBReaderToIoTHub": "FROM /messages/modules/isbreader/outputs/* INTO $upstream"
+          "ISBReaderToIoTHub": "FROM /messages/modules/isbreader/outputs/* INTO $upstream",
+          "sql1ToIoTHub": "FROM /messages/modules/sql1/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
         }
       }
-    }   
+    }
   }
 }
