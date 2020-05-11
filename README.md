@@ -19,6 +19,7 @@ The code for an initial fast-start implementation can be found in the [source ("
 - [Use Cases](docs/USECASES.md)
 - [Requirements](docs/REQUIREMENTS.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Code quality](docs/CODEQUALITY.md)
 
 ### Technical Implementation
 
