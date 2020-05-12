@@ -5,7 +5,7 @@ metadata:
 spec:
   type: state.redis
   metadata:
-    - name: redisHost
+    - name: redisHost1
       value: Redis:6379
     - name: redisPassword
       value: ""

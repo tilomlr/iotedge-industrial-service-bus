@@ -137,6 +137,26 @@
                 ]
               }
             }
+          },
+          "grafana": {
+            "version": "0.0.2",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.grafana}",
+              "createOptions": {
+                "HostConfig": {                 
+                  "PortBindings": {
+                    "3000/tcp": [
+                      {
+                        "HostPort": "3000"
+                      }
+                    ]
+                  }
+                }
+              }              
+            }
           }
         }
       }
@@ -169,7 +189,7 @@
                 "UnitId": "1"
               }
             },
-            "SlaveConnection": "10.0.0.4"
+            "SlaveConnection": "172.16.0.4"
           }
         }
       }
